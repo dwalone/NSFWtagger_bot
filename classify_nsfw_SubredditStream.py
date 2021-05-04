@@ -8,6 +8,7 @@ import sqlite3
 import re
 
 global reddit
+global config
 
 #enter user and app info here
 reddit = praw.Reddit(client_id=client_id,
@@ -16,15 +17,16 @@ reddit = praw.Reddit(client_id=client_id,
                      username=username,
                      password=password)
 
-def main():   
+def main(SUBREDDIT_NAMES):   
     classifier = NudeClassifier()
-    valid_extensions = ['.jpg', '.jpeg', '.bmp', '.png', '.tiff']    
+    valid_extensions = ['.jpg', '.jpeg', '.bmp', '.png', '.tiff']
+    SUBREDDIT_NAMES = SUBREDDIT_NAMES.replace(',','+').replace(' ', '')    
     while True:  
         con = sqlite3.connect('log.db')
         cur = con.cursor()
         try:
 
-            for submission in reddit.subreddit(SUBREDDIT_NAME).stream.submissions():          
+            for submission in reddit.subreddit(SUBREDDIT_NAMES).stream.submissions():          
                                 
                 gallery = []
                 URL = submission.url
@@ -63,7 +65,7 @@ def main():
                         prediction = classifier.classify('temp.jpg')['temp.jpg']['unsafe']
                         #remove post if REMOVE_SUBMISSION is True
                         if prediction > NSFW_PROB_THRESHOLD:
-                            print("nsfw")
+                            #print("nsfw")
                             if LOGGING_ON:
                                 cur.execute("INSERT INTO logbook VALUES (?,?,?)", (submission.created_utc, str(submission.author), submission.permalink))
                                 con.commit()
@@ -74,10 +76,10 @@ def main():
                                     submission.mod.send_removal_message(REMOVAL_MESSAGE)                
                             #send mod mail to mod discussions for testing
                             else:
-                                reddit.subreddit(SUBREDDIT_NAME).message("NSFW image detected!", "post: "+submission.permalink+' p = '+str(prediction)+', threshold is currently '+str(NSFW_PROB_THRESHOLD))
+                                submission.subreddit.message("NSFW image detected!", "post: "+submission.permalink+' p = '+str(prediction)+', threshold is currently '+str(NSFW_PROB_THRESHOLD))
                             break                    
                         else:
-                            print("notnsfw")
+                            #print("notnsfw")
                             pass
 
         except Exception as err:
@@ -87,4 +89,4 @@ def main():
     con.close()
                 
 if __name__ == "__main__":
-    main()
+    main(SUBREDDIT_NAMES)

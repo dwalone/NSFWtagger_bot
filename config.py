@@ -1,4 +1,4 @@
-SUBREDDIT_NAME = '' #enter subreddit name here (without the r/)
+SUBREDDIT_NAMES = '' #enter comma separated subreddit names here (without the r/) e.g. 'pics' or 'pics,hmm,askreddit'
 
 REMOVE_SUBMISSION = True #Set to True or False if you want an NSFW tagged post removed or not
 
