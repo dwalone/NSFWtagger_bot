@@ -6,6 +6,7 @@ import praw
 import urllib.request
 import sqlite3
 import re
+import os
 
 global reddit
 global config
@@ -17,7 +18,8 @@ reddit = praw.Reddit(client_id=client_id,
                      username=username,
                      password=password)
 
-def main(SUBREDDIT_NAMES):   
+def main(SUBREDDIT_NAMES): 
+    tempjpg = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'temp.jpg')  
     classifier = NudeClassifier()
     valid_extensions = ['.jpg', '.jpeg', '.bmp', '.png', '.tiff']
     SUBREDDIT_NAMES = SUBREDDIT_NAMES.replace(',','+').replace(' ', '')    
@@ -56,13 +58,13 @@ def main(SUBREDDIT_NAMES):
                         try:
                             #save image as temp file
                             with urllib.request.urlopen(i) as url:
-                                with open('temp.jpg', 'wb') as f:
+                                with open(tempjpg, 'wb') as f:
                                     f.write(url.read())
                                     f.close()
                         except Exception as err:
                             print(err)
 
-                        prediction = classifier.classify('temp.jpg')['temp.jpg']['unsafe']
+                        prediction = classifier.classify(tempjpg)[tempjpg]['unsafe']
                         #remove post if REMOVE_SUBMISSION is True
                         if prediction > NSFW_PROB_THRESHOLD:
                             #print("nsfw")
