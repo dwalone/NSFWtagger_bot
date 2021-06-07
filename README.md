@@ -8,6 +8,8 @@ Clone repo with `git clone https://github.com/dwalone/NSFWtagger_bot.git`
 
 Install dependencies with `pip install -r requirements.txt`
 
+(You may have to also run `pip install --upgrade nudenet` to install further dependencies)
+
 ### Usage
 
 Create new Reddit user and make it a moderator of your subreddit(s), or use an existing moderator user.
